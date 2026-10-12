@@ -16,6 +16,8 @@ interface UploadAreaProps {
   onError?: (error: string) => void;
   isLoading?: boolean;
   presetText?: string;
+  language?: string;
+  onLanguageChange?: (lang: string) => void;
 }
 
 export const UploadArea: React.FC<UploadAreaProps> = ({
@@ -24,10 +26,18 @@ export const UploadArea: React.FC<UploadAreaProps> = ({
   onError,
   isLoading = false,
   presetText,
+  language: propLanguage,
+  onLanguageChange,
 }) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('text');
-  const [language, setLanguage] = useState<string>('en');
+  const [internalLanguage, setInternalLanguage] = useState<string>(propLanguage || 'en');
+
+  const currentLanguage = propLanguage || internalLanguage;
+  const handleLanguageChange = (lang: string) => {
+    setInternalLanguage(lang);
+    if (onLanguageChange) onLanguageChange(lang);
+  };
 
   // Input states
   const [text, setText] = useState<string>(presetText || '');
@@ -72,11 +82,11 @@ export const UploadArea: React.FC<UploadAreaProps> = ({
     try {
       let result: VerificationResult;
       if (activeTab === 'text') {
-        result = await verifyText(text.trim(), language);
+        result = await verifyText(text.trim(), currentLanguage);
       } else if (activeTab === 'file' && file) {
-        result = await verifyFile(file, language);
+        result = await verifyFile(file, currentLanguage);
       } else if (activeTab === 'url') {
-        result = await verifyUrl(url.trim(), language);
+        result = await verifyUrl(url.trim(), currentLanguage);
       } else {
         throw new Error('Please provide input to verify.');
       }
@@ -212,7 +222,7 @@ export const UploadArea: React.FC<UploadAreaProps> = ({
 
         {/* Action Bar */}
         <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-t border-slate-100">
-          <LanguageSelector value={language} onChange={setLanguage} disabled={isBusy} />
+          <LanguageSelector value={currentLanguage} onChange={handleLanguageChange} disabled={isBusy} />
 
           <button
             type="submit"

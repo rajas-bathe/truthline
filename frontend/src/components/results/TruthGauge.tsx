@@ -3,11 +3,14 @@ import type { Verdict } from '../../types';
 import { VERDICT_CONFIG } from '../../types';
 import { ShieldAlert, ShieldCheck, HelpCircle, AlertTriangle, History } from 'lucide-react';
 
+import { getVerdictInfo, getUi } from '../../utils/translations';
+
 interface TruthGaugeProps {
   truthScore: number; // 0 to 100
   verdict: Verdict;
   evidenceStrength?: number; // 0 to 100
   confidence?: number; // 0 to 1
+  language?: string;
 }
 
 export const TruthGauge: React.FC<TruthGaugeProps> = ({
@@ -15,9 +18,11 @@ export const TruthGauge: React.FC<TruthGaugeProps> = ({
   verdict,
   evidenceStrength = 85,
   confidence = 0.9,
+  language = 'en',
 }) => {
   // Clamp score between 0 and 100
   const score = Math.max(0, Math.min(100, Math.round(truthScore)));
+  const localized = getVerdictInfo(verdict, language);
 
   // Arc geometry:
   // Semi-circle arc with radius = 68, cx = 100, cy = 88
@@ -36,28 +41,24 @@ export const TruthGauge: React.FC<TruthGaugeProps> = ({
   // Color mapping based on score & verdict
   let scoreColor = '#ef4444'; // Red
   let scoreBg = 'from-red-500/10 to-red-500/5 text-red-700 border-red-200';
-  let statusTitle = 'DEBUNKED HOAX / FALSE';
+  let statusTitle = localized.gaugeStatus;
   let StatusIcon = ShieldAlert;
 
   if (score >= 75) {
     scoreColor = '#10b981'; // Emerald
     scoreBg = 'from-emerald-500/10 to-emerald-500/5 text-emerald-700 border-emerald-200';
-    statusTitle = 'CONFIRMED TRUE';
     StatusIcon = ShieldCheck;
   } else if (score >= 45) {
     scoreColor = '#f97316'; // Orange / Partly supported
     scoreBg = 'from-orange-500/10 to-orange-500/5 text-orange-700 border-orange-200';
-    statusTitle = 'PARTIALLY SUPPORTED';
     StatusIcon = AlertTriangle;
   } else if (verdict === 'outdated') {
     scoreColor = '#f59e0b'; // Amber
     scoreBg = 'from-amber-500/10 to-amber-500/5 text-amber-700 border-amber-200';
-    statusTitle = 'OUTDATED INFORMATION';
     StatusIcon = History;
   } else if (verdict === 'cannot_confirm') {
     scoreColor = '#64748b'; // Slate
     scoreBg = 'from-slate-500/10 to-slate-500/5 text-slate-700 border-slate-200';
-    statusTitle = 'CANNOT BE CONFIRMED';
     StatusIcon = HelpCircle;
   }
 
@@ -149,15 +150,15 @@ export const TruthGauge: React.FC<TruthGaugeProps> = ({
             letterSpacing="0.12em"
             className="uppercase select-none"
           >
-            Truth Score
+            {getUi('truthScore', language)}
           </text>
 
           {/* Outer Scale Extremes */}
           <text x="24" y="106" textAnchor="start" fill="#ef4444" fontSize="9.5" fontWeight="700">
-            0% FALSE
+            {getUi('falsePct', language)}
           </text>
           <text x="176" y="106" textAnchor="end" fill="#10b981" fontSize="9.5" fontWeight="700">
-            100% TRUE
+            {getUi('truePct', language)}
           </text>
         </svg>
       </div>
@@ -171,13 +172,13 @@ export const TruthGauge: React.FC<TruthGaugeProps> = ({
       </div>
 
       <p className="text-xs text-slate-600 mt-2 max-w-xs leading-relaxed">
-        {VERDICT_CONFIG[verdict]?.description || 'Based on multi-source verified evidence.'}
+        {localized.description || VERDICT_CONFIG[verdict]?.description || 'Based on multi-source verified evidence.'}
       </p>
 
       {/* Secondary Metrics Bar */}
       <div className="w-full grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-slate-100 text-left">
         <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-          <div className="text-[10px] font-semibold text-slate-400 uppercase">Evidence Authority</div>
+          <div className="text-[10px] font-semibold text-slate-400 uppercase">{getUi('evidenceAuthority', language)}</div>
           <div className="flex items-center justify-between mt-1">
             <span className="text-xs font-bold text-slate-800">{evidenceStrength}%</span>
             <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">

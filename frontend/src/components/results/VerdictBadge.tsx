@@ -3,8 +3,11 @@ import { CheckCircle, XCircle, Clock, AlertTriangle, HelpCircle } from 'lucide-r
 import type { Verdict } from '../../types';
 import { VERDICT_CONFIG } from '../../types';
 
+import { getVerdictInfo } from '../../utils/translations';
+
 interface VerdictBadgeProps {
   verdict: Verdict;
+  language?: string;
   showDescription?: boolean;
   size?: 'sm' | 'md' | 'lg';
 }
@@ -19,10 +22,12 @@ const ICON_MAP = {
 
 export const VerdictBadge: React.FC<VerdictBadgeProps> = ({
   verdict,
+  language = 'en',
   showDescription = false,
   size = 'md',
 }) => {
   const config = VERDICT_CONFIG[verdict] || VERDICT_CONFIG['cannot_confirm'];
+  const localized = getVerdictInfo(verdict, language);
   const IconComponent = ICON_MAP[config.icon as keyof typeof ICON_MAP] || HelpCircle;
 
   const sizeClasses = {
@@ -43,11 +48,11 @@ export const VerdictBadge: React.FC<VerdictBadgeProps> = ({
         className={`inline-flex items-center rounded-full border shadow-2xs font-medium uppercase tracking-wider ${config.bgColor} ${config.color} ${sizeClasses}`}
       >
         <IconComponent className={`${iconSizes} shrink-0`} />
-        <span>{config.label}</span>
+        <span>{localized.label}</span>
       </span>
       {showDescription && (
         <span className="text-[11px] text-slate-500 font-normal">
-          {config.description}
+          {localized.description}
         </span>
       )}
     </div>

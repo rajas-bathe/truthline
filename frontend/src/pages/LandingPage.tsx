@@ -13,23 +13,41 @@ export const LandingPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<VerificationResult | null>(null);
   const [presetText, setPresetText] = useState<string>('');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
   const resultsRef = useRef<HTMLDivElement>(null);
+  const loadingRef = useRef<HTMLDivElement>(null);
   const uploadRef = useRef<HTMLDivElement>(null);
 
   const handleStart = () => {
     setLoading(true);
     setError(null);
     setResult(null);
+    setTimeout(() => {
+      if (loadingRef.current) {
+        const yOffset = -90;
+        const y = loadingRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      }
+    }, 60);
   };
 
   const handleResult = (newResult: VerificationResult) => {
     setLoading(false);
     setError(null);
     setResult(newResult);
-    setTimeout(() => {
-      resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
   };
+
+  // Automatically and reliably scroll to results whenever new results are received
+  React.useEffect(() => {
+    if (result && resultsRef.current) {
+      const scrollTimer = setTimeout(() => {
+        const yOffset = -80; // Account for 64px sticky header + 16px buffer
+        const y = resultsRef.current!.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      }, 100);
+      return () => clearTimeout(scrollTimer);
+    }
+  }, [result]);
 
   const handleError = (err: string) => {
     setLoading(false);
@@ -48,7 +66,7 @@ export const LandingPage: React.FC = () => {
     setPresetText(scenarioText);
     handleStart();
     try {
-      const res = await verifyText(scenarioText, 'en');
+      const res = await verifyText(scenarioText, selectedLanguage);
       handleResult(res);
     } catch (err: any) {
       handleError(err.response?.data?.message || err.message || 'Verification failed. Please try again.');
@@ -91,6 +109,8 @@ export const LandingPage: React.FC = () => {
 
         <UploadArea
           presetText={presetText}
+          language={selectedLanguage}
+          onLanguageChange={setSelectedLanguage}
           onStart={handleStart}
           onResult={handleResult}
           onError={handleError}
@@ -98,7 +118,11 @@ export const LandingPage: React.FC = () => {
         />
 
         {/* Loading state */}
-        {loading && <LoadingSpinner />}
+        {loading && (
+          <div ref={loadingRef} className="pt-4 scroll-mt-24">
+            <LoadingSpinner />
+          </div>
+        )}
 
         {/* Error state */}
         {error && !loading && (
@@ -108,7 +132,7 @@ export const LandingPage: React.FC = () => {
 
       {/* Inline Results Section */}
       {result && (
-        <section ref={resultsRef} className="pt-6 border-t border-slate-200">
+        <section ref={resultsRef} className="pt-6 border-t border-slate-200 scroll-mt-20">
           <ResultsView result={result} onCheckAnother={handleReset} />
         </section>
       )}

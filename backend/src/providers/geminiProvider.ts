@@ -49,7 +49,8 @@ export class GeminiProvider {
    */
   async verifyClaim(
     inputText: string,
-    multimodalParts?: Array<{ mimeType: string; data: string }>
+    multimodalParts?: Array<{ mimeType: string; data: string }>,
+    language: string = 'en'
   ): Promise<GeminiVerificationOutput> {
     if (!this.client) {
       throw new Error('Gemini API key is not configured. Falling back to offline mode.');
@@ -67,6 +68,13 @@ export class GeminiProvider {
         }
       });
 
+      const langInstruction =
+        language === 'hi'
+          ? '\n7. LANGUAGE: You MUST write the "explanation", claim "reasoning", "challengerNotes", and "auditorNotes" in natural, accurate Hindi (हिन्दी script).\n'
+          : language === 'mr'
+          ? '\n7. LANGUAGE: You MUST write the "explanation", claim "reasoning", "challengerNotes", and "auditorNotes" in natural, accurate Marathi (मराठी script).\n'
+          : '';
+
       const systemPrompt = `
 You are TRUTHLINE AI ("Don't Just Forward. Verify."), an elite objective forensic fact-checker and claim verification engine.
 Analyze the user's input with absolute objectivity and thorough search grounding.
@@ -82,7 +90,7 @@ RULES:
    - "CANNOT_CONFIRM": Insufficient authoritative evidence to verify or debunk. NEVER label false merely because no evidence was found!
 4. Challenger Agent: Actively look for omitted context, cognitive bias, or misleading framing.
 5. Evidence Auditor: Verify citations exist, match genuine publishers, and directly support findings.
-6. Provide an Overall Verdict, a concise plain-language explanation suitable for WhatsApp forwarding, and honest limitations.
+6. Provide an Overall Verdict, a concise plain-language explanation suitable for WhatsApp forwarding, and honest limitations.${langInstruction}
 
 Respond with valid JSON inside a code block:
 \`\`\`json

@@ -4,6 +4,7 @@ import { formatDate, formatDuration } from '../../utils/formatters';
 import { VERDICT_CONFIG } from '../../types';
 import { CheckCircle2, Clock, Activity, FileCheck2, ShieldCheck, Check, Layers } from 'lucide-react';
 import { TruthGauge } from './TruthGauge';
+import { localizeContent, getUi } from '../../utils/translations';
 
 interface SummaryProps {
   result: VerificationResult;
@@ -11,6 +12,7 @@ interface SummaryProps {
 
 export const Summary: React.FC<SummaryProps> = ({ result }) => {
   const { summary, metadata, claims, overallVerdict, truthScore, evidenceStrengthScore } = result;
+  const currentLang = metadata?.language || 'en';
 
   // Count verdicts
   const counts: Record<Verdict, number> = {
@@ -45,6 +47,7 @@ export const Summary: React.FC<SummaryProps> = ({ result }) => {
             verdict={activeVerdict}
             evidenceStrength={evidenceStrengthScore ?? 85}
             confidence={claims[0]?.confidence ?? 0.9}
+            language={currentLang}
           />
         </div>
 
@@ -59,7 +62,7 @@ export const Summary: React.FC<SummaryProps> = ({ result }) => {
                 </h3>
               </div>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
-                Completed
+                {getUi('completed', currentLang)}
               </span>
             </div>
 
@@ -68,9 +71,11 @@ export const Summary: React.FC<SummaryProps> = ({ result }) => {
               <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-100 text-sm text-slate-800 leading-relaxed space-y-1.5">
                 <p className="font-semibold text-slate-900 flex items-center gap-1.5 text-xs uppercase tracking-wider text-indigo-700">
                   <CheckCircle2 className="w-4 h-4 text-indigo-600" />
-                  Key Finding:
+                  {getUi('keyFinding', currentLang)}
                 </p>
-                <p className="text-slate-700 leading-relaxed font-normal">{summary}</p>
+                <p className="text-slate-700 leading-relaxed font-normal">
+                  {localizeContent(summary, currentLang)}
+                </p>
               </div>
             )}
           </div>
@@ -80,25 +85,25 @@ export const Summary: React.FC<SummaryProps> = ({ result }) => {
             <div className="flex items-center justify-between text-xs text-slate-500">
               <span className="flex items-center gap-1.5 font-semibold text-slate-700">
                 <Layers className="w-4 h-4 text-indigo-600" />
-                Multi-Stage Verification Pipeline
+                {getUi('pipelineTitle', currentLang)}
               </span>
               <span className="font-mono text-emerald-600 font-bold flex items-center gap-1">
-                <Check className="w-3.5 h-3.5" /> 8 / 8 Stages Executed
+                <Check className="w-3.5 h-3.5" /> {getUi('stagesExecuted', currentLang)}
               </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2.5 text-center">
               <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100">
-                <div className="text-[10px] text-slate-400 font-bold uppercase">Claims Checked</div>
+                <div className="text-[10px] text-slate-400 font-bold uppercase">{getUi('claimsChecked', currentLang)}</div>
                 <div className="text-lg font-black text-slate-900">{total}</div>
               </div>
               <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100">
-                <div className="text-[10px] text-slate-400 font-bold uppercase">Processing Time</div>
+                <div className="text-[10px] text-slate-400 font-bold uppercase">{getUi('processingTime', currentLang)}</div>
                 <div className="text-lg font-black text-slate-900">{formatDuration(metadata.processingTimeMs)}</div>
               </div>
               <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100">
-                <div className="text-[10px] text-slate-400 font-bold uppercase">Language</div>
-                <div className="text-lg font-black text-slate-900 uppercase">{metadata.language || 'EN'}</div>
+                <div className="text-[10px] text-slate-400 font-bold uppercase">{getUi('language', currentLang)}</div>
+                <div className="text-lg font-black text-slate-900 uppercase">{currentLang}</div>
               </div>
             </div>
           </div>

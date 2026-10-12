@@ -5,10 +5,11 @@ import { ClaimCard } from './ClaimCard';
 import { SafetyBanner } from './SafetyBanner';
 import { WhatsAppRebuttalCard } from './WhatsAppRebuttalCard';
 import { EvidenceAuthorityChart } from './EvidenceAuthorityChart';
-import { LanguageSelector } from '../common/LanguageSelector';
 import { getFileTypeIcon } from '../../utils/formatters';
 import { RotateCcw, Share2, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+
+import { getUi } from '../../utils/translations';
 
 interface ResultsViewProps {
   result: VerificationResult;
@@ -17,9 +18,7 @@ interface ResultsViewProps {
 
 export const ResultsView: React.FC<ResultsViewProps> = ({ result, onCheckAnother }) => {
   const navigate = useNavigate();
-  const [selectedLanguage, setSelectedLanguage] = useState<string>(
-    result.metadata?.language || 'en'
-  );
+  const activeLanguage = result.metadata?.language || 'en';
   const [copied, setCopied] = useState(false);
 
   const InputTypeIcon = getFileTypeIcon(result.metadata?.inputType || 'text');
@@ -65,24 +64,22 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ result, onCheckAnother
 
   return (
     <div className="space-y-8 animate-fade-in max-w-5xl mx-auto">
-      {/* Top action toolbar */}
+      {/* Top action toolbar - Clean, no duplicate language picker */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-sm text-slate-600 font-medium">
           <div className="p-1.5 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200">
             <InputTypeIcon className="w-4 h-4" />
           </div>
-          <span>Input Format:</span>
+          <span>{getUi('inputFormat', activeLanguage)}:</span>
           <span className="capitalize font-semibold text-slate-800">
             {result.metadata?.inputType || 'Text'}
+          </span>
+          <span className="ml-2 px-2 py-0.5 text-xs font-bold rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase">
+            {activeLanguage}
           </span>
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-          <LanguageSelector
-            value={selectedLanguage}
-            onChange={(lang) => setSelectedLanguage(lang)}
-          />
-
           <button
             type="button"
             onClick={handleCopyLink}
@@ -90,7 +87,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ result, onCheckAnother
             title="Share or copy report link"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5" />}
-            <span>{copied ? 'Copied' : 'Share'}</span>
+            <span>{copied ? getUi('copied', activeLanguage) : getUi('share', activeLanguage)}</span>
           </button>
 
           <button
@@ -99,15 +96,15 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ result, onCheckAnother
             className="btn-primary py-2 px-4 flex items-center gap-1.5 text-xs shadow-xs"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Check Another</span>
+            <span>{getUi('checkAnother', activeLanguage)}</span>
           </button>
         </div>
       </div>
 
       {/* Safety / Forwarding Advisory Banner */}
-      <SafetyBanner verdict={activeVerdict} onScrollToRebuttal={scrollToRebuttal} />
+      <SafetyBanner verdict={activeVerdict} language={activeLanguage} onScrollToRebuttal={scrollToRebuttal} />
 
-      {/* Hero Visuals + Summary (Truth Gauge + Three.js 3D Sphere + Breakdown) */}
+      {/* Hero Visuals + Summary (Truth Gauge + Metrics Breakdown) */}
       <Summary result={result} />
 
       {/* WhatsApp Ready-to-Send Rebuttal Card */}
@@ -120,22 +117,22 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ result, onCheckAnother
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-1 border-b border-slate-200">
           <h3 className="text-xl font-bold text-slate-900 tracking-tight">
-            Independent Claim-by-Claim Verification ({result.claims?.length || 0})
+            {getUi('claimByClaim', activeLanguage)} ({result.claims?.length || 0})
           </h3>
           <span className="text-xs text-slate-500">
-            Every statement checked individually against official records
+            {getUi('claimSubtitle', activeLanguage)}
           </span>
         </div>
 
         {result.claims && result.claims.length > 0 ? (
           <div className="space-y-5">
             {result.claims.map((claim, idx) => (
-              <ClaimCard key={claim.id || idx} claim={claim} index={idx} />
+              <ClaimCard key={claim.id || idx} claim={claim} index={idx} language={activeLanguage} />
             ))}
           </div>
         ) : (
           <div className="card text-center p-8 text-slate-500 text-sm">
-            No specific verifiable claims were isolated in this input.
+            {getUi('noClaims', activeLanguage)}
           </div>
         )}
       </div>

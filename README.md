@@ -1,8 +1,8 @@
-# SachCheck — AI-Powered Claim Verification Platform
+# TruthLine — AI-Powered Claim Verification Platform
 
 > **"Don't Just Forward. Verify."**
 
-SachCheck is an end-to-end multimodal misinformation detection and claim verification platform. It features an **8-stage verification pipeline** that cross-examines claims against live grounded search, fact-check databases, and challenger/auditor AI agents, accessible via both a modern React web frontend and a Chrome Extension.
+TruthLine is an end-to-end multimodal misinformation detection and claim verification platform. It features an **8-stage verification pipeline** that cross-examines claims against live grounded search, fact-check databases, and challenger/auditor AI agents, accessible via both a modern React web frontend and a Chrome Extension.
 
 ---
 
@@ -44,7 +44,7 @@ ChromEx/
 
 ## The Five Verdict Types
 
-SachCheck evaluates claims into five calibrated verdicts:
+TruthLine evaluates claims into five calibrated verdicts:
 
 | Verdict | Meaning & Criteria |
 | :--- | :--- |
@@ -97,7 +97,7 @@ TAVILY_API_KEY=your_optional_tavily_key
 GOOGLE_FACTCHECK_API_KEY=your_optional_google_factcheck_key
 ```
 
-> **Note:** If `GEMINI_API_KEY` is not provided, SachCheck automatically runs in a self-contained **Offline Demo Mode** with realistic simulated pipeline outputs.
+> **Note:** If `GEMINI_API_KEY` is not provided, TruthLine automatically runs in a self-contained **Offline Demo Mode** with realistic simulated pipeline outputs.
 
 ---
 

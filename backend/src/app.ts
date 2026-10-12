@@ -31,17 +31,33 @@ export function createApp(): express.Application {
     })
   );
 
-  // 2. Strict CORS Configuration
+  // 2. CORS Configuration
   app.use(
     cors({
       origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps, curl, extension service workers)
+        // Allow requests with no origin (like mobile apps, curl, extension service workers, same-origin)
         if (!origin) return callback(null, true);
+
+        // Always allow Vercel domains (*.vercel.app), localhost, and browser extensions
+        if (
+          process.env.NODE_ENV === 'development' ||
+          process.env.VERCEL ||
+          origin.includes('vercel.app') ||
+          origin.includes('localhost') ||
+          origin.includes('127.0.0.1') ||
+          origin.startsWith('chrome-extension://')
+        ) {
+          return callback(null, true);
+        }
 
         // Check configurable ALLOWED_ORIGINS
         const allowedOriginsEnv = process.env.ALLOWED_ORIGINS
           ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
-          : ['http://localhost:5173', 'http://localhost:3000', 'chrome-extension://*'];
+          : ['*'];
+
+        if (allowedOriginsEnv.includes('*')) {
+          return callback(null, true);
+        }
 
         const isAllowedByEnv = allowedOriginsEnv.some((allowed) => {
           if (allowed.endsWith('*')) {
@@ -54,22 +70,8 @@ export function createApp(): express.Application {
           return callback(null, true);
         }
 
-        // Allow localhost and Chrome extension origins
-        if (
-          origin.startsWith('chrome-extension://') ||
-          origin.includes('localhost') ||
-          origin.includes('127.0.0.1')
-        ) {
-          return callback(null, true);
-        }
-
-        // Allow all in development mode
-        if (process.env.NODE_ENV === 'development') {
-          return callback(null, true);
-        }
-
-        logger.warn(`CORS rejected for origin: ${origin}`);
-        callback(new Error(`Origin "${origin}" not allowed by CORS`));
+        // Always allow public web origins instead of throwing 500
+        return callback(null, true);
       },
       methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Truthline-Session'],
@@ -95,16 +97,20 @@ export function createApp(): express.Application {
   app.use('/api/demo', demoRouter);
 
   // Root welcome & API info
-  app.get('/', (_req: Request, res: Response, next: NextFunction) => {
-    if (process.env.NODE_ENV === 'production') {
-      return next();
-    }
+  const welcomeHandler = (_req: Request, res: Response) => {
     res.json({
       name: 'TRUTHLINE AI — Verification Server',
       tagline: "DON'T JUST FORWARD. VERIFY.",
       status: 'ONLINE',
       docs: '/api/health'
     });
+  };
+  app.get('/api', welcomeHandler);
+  app.get('/', (_req: Request, res: Response, next: NextFunction) => {
+    if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
+      return next();
+    }
+    welcomeHandler(_req, res);
   });
 
   // After all API routes, serve frontend static files in production

@@ -2,57 +2,61 @@ import React from 'react';
 import type { Verdict } from '../../types';
 import { AlertOctagon, CheckCircle2, History, AlertTriangle, HelpCircle, ArrowRight } from 'lucide-react';
 
+import { getVerdictInfo } from '../../utils/translations';
+
 interface SafetyBannerProps {
   verdict: Verdict;
+  language?: string;
   onScrollToRebuttal?: () => void;
 }
 
-export const SafetyBanner: React.FC<SafetyBannerProps> = ({ verdict, onScrollToRebuttal }) => {
+export const SafetyBanner: React.FC<SafetyBannerProps> = ({
+  verdict,
+  language = 'en',
+  onScrollToRebuttal,
+}) => {
+  const localized = getVerdictInfo(verdict, language);
+
   const configs = {
     false: {
       bg: 'bg-red-600 text-white',
       badgeBg: 'bg-red-800 text-red-100',
       icon: AlertOctagon,
-      title: 'DO NOT FORWARD THIS MESSAGE',
-      subtitle:
-        'This message contains fabricated or debunked claims. Forwarding it causes unnecessary panic and spreads false information.',
-      actionText: 'Copy Rebuttal to send back to sender',
+      title: localized.bannerTitle,
+      subtitle: localized.bannerSubtitle,
+      actionText: localized.bannerAction,
     },
     verified: {
       bg: 'bg-emerald-600 text-white',
       badgeBg: 'bg-emerald-800 text-emerald-100',
       icon: CheckCircle2,
-      title: 'SAFE TO SHARE: CONFIRMED FACTUAL',
-      subtitle:
-        'This message has been cross-referenced with official records and authoritative reporting. The key claims are factual.',
-      actionText: 'View supporting evidence sources',
+      title: localized.bannerTitle,
+      subtitle: localized.bannerSubtitle,
+      actionText: localized.bannerAction,
     },
     outdated: {
       bg: 'bg-amber-600 text-white',
       badgeBg: 'bg-amber-800 text-amber-100',
       icon: History,
-      title: 'CAUTION: OUTDATED INFORMATION',
-      subtitle:
-        'This notice was valid in the past, but is no longer true today. Do not forward it as breaking or current news.',
-      actionText: 'See historical context details',
+      title: localized.bannerTitle,
+      subtitle: localized.bannerSubtitle,
+      actionText: localized.bannerAction,
     },
     partly_supported: {
       bg: 'bg-orange-600 text-white',
       badgeBg: 'bg-orange-800 text-orange-100',
       icon: AlertTriangle,
-      title: 'MISLEADING: PARTIALLY ACCURATE',
-      subtitle:
-        'Contains real elements mixed with exaggerated or false assertions. Needs context before sharing.',
-      actionText: 'Inspect verified vs unverified parts',
+      title: localized.bannerTitle,
+      subtitle: localized.bannerSubtitle,
+      actionText: localized.bannerAction,
     },
     cannot_confirm: {
       bg: 'bg-slate-700 text-white',
       badgeBg: 'bg-slate-800 text-slate-200',
       icon: HelpCircle,
-      title: 'UNCONFIRMED: EXERCISE SKEPTICISM',
-      subtitle:
-        'Insufficient credible public evidence exists to support or refute this claim at this time.',
-      actionText: 'Review available search queries',
+      title: localized.bannerTitle,
+      subtitle: localized.bannerSubtitle,
+      actionText: localized.bannerAction,
     },
   };
 

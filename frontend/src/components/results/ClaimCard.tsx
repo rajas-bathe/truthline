@@ -4,13 +4,15 @@ import { VerdictBadge } from './VerdictBadge';
 import { EvidencePanel } from './EvidencePanel';
 import { Clock, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { formatDate } from '../../utils/formatters';
+import { localizeContent } from '../../utils/translations';
 
 interface ClaimCardProps {
   claim: ClaimResult;
   index: number;
+  language?: string;
 }
 
-export const ClaimCard: React.FC<ClaimCardProps> = ({ claim, index }) => {
+export const ClaimCard: React.FC<ClaimCardProps> = ({ claim, index, language = 'en' }) => {
   const borderColors: Record<Verdict, string> = {
     false: 'border-l-4 border-l-red-500',
     verified: 'border-l-4 border-l-emerald-500',
@@ -41,7 +43,7 @@ export const ClaimCard: React.FC<ClaimCardProps> = ({ claim, index }) => {
           <div className="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0">
             #{index + 1}
           </div>
-          <VerdictBadge verdict={claim.verdict} />
+          <VerdictBadge verdict={claim.verdict} language={language} />
         </div>
 
         {/* Claim Truth meter */}
@@ -49,14 +51,14 @@ export const ClaimCard: React.FC<ClaimCardProps> = ({ claim, index }) => {
           <div className="flex items-center gap-1.5 text-xs font-semibold">
             {claim.verdict === 'false' ? (
               <span className="text-red-600 flex items-center gap-1">
-                <ShieldAlert className="w-3.5 h-3.5" /> 0% True
+                <ShieldAlert className="w-3.5 h-3.5" /> 0% {language === 'hi' ? 'सत्य' : language === 'mr' ? 'खरे' : 'True'}
               </span>
             ) : claim.verdict === 'verified' ? (
               <span className="text-emerald-600 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5" /> {claimTruthScore}% True
+                <ShieldCheck className="w-3.5 h-3.5" /> {claimTruthScore}% {language === 'hi' ? 'सत्य' : language === 'mr' ? 'खरे' : 'True'}
               </span>
             ) : (
-              <span className="text-slate-600">{claimTruthScore}% True</span>
+              <span className="text-slate-600">{claimTruthScore}% {language === 'hi' ? 'सत्य' : language === 'mr' ? 'खरे' : 'True'}</span>
             )}
           </div>
           <div className="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -87,8 +89,10 @@ export const ClaimCard: React.FC<ClaimCardProps> = ({ claim, index }) => {
           "{claim.claimText}"
         </h4>
         <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-sm text-slate-700 leading-relaxed font-normal">
-          <span className="font-semibold text-slate-800">Factual Analysis: </span>
-          {claim.explanation}
+          <span className="font-semibold text-slate-800">
+            {language === 'hi' ? 'तथ्य विश्लेषण: ' : language === 'mr' ? 'तथ्य विश्लेषण: ' : 'Factual Analysis: '}
+          </span>
+          {localizeContent(claim.explanation, language)}
         </div>
       </div>
 

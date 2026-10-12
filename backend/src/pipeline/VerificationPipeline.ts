@@ -49,6 +49,7 @@ export interface PipelineExecutionResult {
   }>;
   stageTimings: Record<string, number>;
   isDemoMode: boolean;
+  language?: string;
 }
 
 export class VerificationPipeline {
@@ -94,11 +95,14 @@ export class VerificationPipeline {
       detailsJson: JSON.stringify({ inputType: s1Out.inputType, chars: s1Out.characterCount })
     });
 
+    const language = input.language || 'en';
+    const cacheKey = `${s1Out.contentHash}_${language}`;
+
     // Check Cache (if text input and not file)
     if (['text', 'url', 'selected_text', 'whatsapp_selection'].includes(input.inputType)) {
-      const cached = this.repository.findCachedVerification(s1Out.contentHash, config.cacheTtlHours);
+      const cached = this.repository.findCachedVerification(cacheKey, config.cacheTtlHours);
       if (cached) {
-        logger.info(`Returning cached verification result for hash: ${s1Out.contentHash.slice(0, 8)}...`);
+        logger.info(`Returning cached verification result for key: ${cacheKey.slice(0, 12)}...`);
         return {
           id: cached.id,
           verdict: cached.overallVerdict as AllowedVerdict,
@@ -128,7 +132,8 @@ export class VerificationPipeline {
             isSupporting: s.isSupporting
           })),
           stageTimings: { cacheHit: 1 },
-          isDemoMode: !this.providers.isLiveAiAvailable()
+          isDemoMode: !this.providers.isLiveAiAvailable(),
+          language
         };
       }
     }
@@ -136,7 +141,8 @@ export class VerificationPipeline {
     // Call Provider Manager for Grounded Inference / Offline Demo
     const { result: providerResult, report } = await this.providers.verify(
       s1Out.extractedFullText,
-      s1Out.multimodalParts
+      s1Out.multimodalParts,
+      language
     );
 
     // Stage 2: Claim Extraction
@@ -235,7 +241,8 @@ export class VerificationPipeline {
       s7Out,
       providerResult.overallVerdict,
       providerResult.explanation,
-      providerResult.limitations
+      providerResult.limitations,
+      language
     );
     stageTimings['Stage8_VerdictSynthesizer'] = Date.now() - s8Start;
     stagesForDb.push({
@@ -263,7 +270,7 @@ export class VerificationPipeline {
       auditorNotes: s7Out.auditorNotes,
       limitations: s8Out.limitations,
       executionTimeMs: totalDuration,
-      contentHash: s1Out.contentHash,
+      contentHash: cacheKey,
       createdAt,
       atomicClaims: s7Out.auditedClaims.map(c => ({
         id: c.id,
@@ -324,7 +331,8 @@ export class VerificationPipeline {
         isSupporting: s.isSupporting
       })),
       stageTimings,
-      isDemoMode: report.isOfflineDemo
+      isDemoMode: report.isOfflineDemo,
+      language
     };
   }
 }

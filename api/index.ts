@@ -21,5 +21,10 @@ const app = createApp();
 
 export default function handler(req: any, res: any) {
   ensureInitialized();
+  if (req.originalUrl && req.originalUrl.startsWith('/api')) {
+    req.url = req.originalUrl;
+  } else if (req.url && !req.url.startsWith('/api')) {
+    req.url = '/api' + req.url;
+  }
   return app(req, res);
 }

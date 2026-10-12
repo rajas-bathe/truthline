@@ -14,6 +14,7 @@ export interface Stage1Input {
   fileMimeType?: string;
   fileName?: string;
   consent: boolean;
+  language?: string;
 }
 
 export interface Stage1Output {
@@ -22,6 +23,7 @@ export interface Stage1Output {
   inputType: string;
   characterCount: number;
   contentHash: string;
+  language?: string;
   multimodalParts?: Array<{ mimeType: string; data: string }>;
   sanitization: PromptSanitizationResult;
   metadata: Record<string, any>;
@@ -123,6 +125,7 @@ export class Stage1_InputProcessor {
       inputType: input.inputType,
       characterCount: extractedText.length,
       contentHash,
+      language: input.language || 'en',
       multimodalParts,
       sanitization,
       metadata

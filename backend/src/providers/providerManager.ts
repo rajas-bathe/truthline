@@ -45,7 +45,8 @@ export class ProviderManager {
 
   async verify(
     text: string,
-    multimodalParts?: Array<{ mimeType: string; data: string }>
+    multimodalParts?: Array<{ mimeType: string; data: string }>,
+    language: string = 'en'
   ): Promise<{ result: any; report: ProviderExecutionReport }> {
     const report: ProviderExecutionReport = {
       geminiUsed: false,
@@ -57,8 +58,8 @@ export class ProviderManager {
 
     if (this.gemini.isAvailable()) {
       try {
-        logger.info(`Running live verification with Gemini (${this.gemini.getModelName()})...`);
-        const geminiResult = await this.gemini.verifyClaim(text, multimodalParts);
+        logger.info(`Running live verification with Gemini (${this.gemini.getModelName()}) in [${language}]...`);
+        const geminiResult = await this.gemini.verifyClaim(text, multimodalParts, language);
         report.geminiUsed = true;
 
         // If Tavily key is also available, enhance with additional web citations
@@ -86,8 +87,8 @@ export class ProviderManager {
     }
 
     // Fallback with Live Tavily Search augmentation
-    logger.info('Executing live search verification provider...');
-    const demoResult = this.demo.verifyOffline(text);
+    logger.info(`Executing verification provider for [${language}]...`);
+    const demoResult = this.demo.verifyOffline(text, language);
     report.isOfflineDemo = !this.gemini.isAvailable();
 
     if (this.tavily.isAvailable()) {

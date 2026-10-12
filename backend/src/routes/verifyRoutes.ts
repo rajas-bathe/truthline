@@ -46,7 +46,8 @@ const handleVerification = async (req: AuthenticatedRequest, res: Response) => {
       inputType: inputType as any,
       content: req.body?.content || req.body?.text,
       url: req.body?.url,
-      consent: true
+      consent: true,
+      language: (req.body?.language as string) || 'en'
     };
 
     if (req.file) {

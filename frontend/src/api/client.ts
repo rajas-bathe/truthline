@@ -25,9 +25,11 @@ function normalizeVerdict(raw: string): Verdict {
   return 'cannot_confirm';
 }
 
-function normalizeResult(data: any): VerificationResult {
+function normalizeResult(data: any, fallbackLanguage: string = 'en'): VerificationResult {
+  const chosenLang = data.language || data.metadata?.language || fallbackLanguage || 'en';
   // If data is already in frontend format
   if (data.jobId && data.claims && Array.isArray(data.claims)) {
+    if (data.metadata) data.metadata.language = chosenLang;
     return data as VerificationResult;
   }
 
@@ -122,7 +124,7 @@ function normalizeResult(data: any): VerificationResult {
       processingTimeMs: data.executionTimeMs || 1200,
       totalClaims: claims.length || 1,
       checkedClaims: claims.length || 1,
-      language: data.language || 'en',
+      language: chosenLang,
       checkedAt: data.createdAt ? new Date(data.createdAt).toISOString() : new Date().toISOString(),
     },
   };
@@ -136,7 +138,7 @@ export async function verifyText(text: string, language?: string): Promise<Verif
     consent: true,
     language,
   });
-  return normalizeResult(data);
+  return normalizeResult(data, language);
 }
 
 export async function verifyFile(file: File, language?: string): Promise<VerificationResult> {
@@ -152,7 +154,7 @@ export async function verifyFile(file: File, language?: string): Promise<Verific
   const { data } = await api.post('/verify/file', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
-  return normalizeResult(data);
+  return normalizeResult(data, language);
 }
 
 export async function verifyUrl(url: string, language?: string): Promise<VerificationResult> {
@@ -162,7 +164,7 @@ export async function verifyUrl(url: string, language?: string): Promise<Verific
     consent: true,
     language,
   });
-  return normalizeResult(data);
+  return normalizeResult(data, language);
 }
 
 export async function getHistory(limit = 20): Promise<VerificationJob[]> {
