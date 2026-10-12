@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRUTHLINE AI — Don't Just Forward. Verify.</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body class="dark-theme">
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-shield">
+          <span class="shield-symbol">🛡️</span>
+        </div>
+        <div>
+          <h1 class="brand-title">TRUTHLINE AI</h1>
+          <p class="brand-tagline">DON'T JUST FORWARD. VERIFY.</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div id="backend-status-pill" class="status-pill status-checking" title="Connecting to TruthLine backend...">
+          <span class="status-dot"></span>
+          <span class="status-label">Checking...</span>
+        </div>
+        <button id="open-panel-btn" class="icon-btn" title="Open Full Investigation Panel">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Navigation / Mode Tabs -->
+    <nav class="input-tabs">
+      <button class="tab-btn active" data-tab="text"><span>📝</span> Text</button>
+      <button class="tab-btn" data-tab="url"><span>🔗</span> URL</button>
+      <button class="tab-btn" data-tab="image"><span>🖼️</span> Image</button>
+      <button class="tab-btn" data-tab="pdf"><span>📄</span> PDF</button>
+      <button class="tab-btn" data-tab="audio"><span>🎙️</span> Audio</button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="content-area">
+      <!-- Tab 1: Text Input -->
+      <section id="tab-pane-text" class="tab-pane active">
+        <div class="form-group">
+          <label for="claim-text-input">Paste Message or Claim to Verify</label>
+          <textarea id="claim-text-input" placeholder="e.g. 'Government announced 5000 rupees grant to all citizens starting tomorrow...'"></textarea>
+          <div class="input-hint">Tip: Paste forwarded WhatsApp rumors, headlines, or suspicious viral quotes.</div>
+        </div>
+      </section>
+
+      <!-- Tab 2: URL Input -->
+      <section id="tab-pane-url" class="tab-pane">
+        <div class="form-group">
+          <label for="claim-url-input">Webpage or Article URL</label>
+          <div class="input-with-button">
+            <input type="url" id="claim-url-input" placeholder="https://news-outlet.com/article..." />
+            <button id="use-current-tab-btn" class="secondary-btn" title="Use current active tab URL">Current Tab</button>
+          </div>
+          <div class="input-hint">TruthLine uses SSRF-safe URL fetching with private network blocking.</div>
+        </div>
+      </section>
+
+      <!-- Tab 3: Image / Screenshot Input -->
+      <section id="tab-pane-image" class="tab-pane">
+        <div class="form-group">
+          <label>Upload Screenshot or Meme Image</label>
+          <div class="dropzone" id="image-dropzone">
+            <input type="file" id="image-file-input" accept="image/png, image/jpeg, image/webp" class="file-hidden">
+            <div class="dropzone-content">
+              <span class="dropzone-icon">🖼️</span>
+              <p class="dropzone-title">Click to browse or drop image</p>
+              <p class="dropzone-sub">PNG, JPG, WebP (Max 15MB)</p>
+            </div>
+            <div id="image-file-preview" class="file-preview-card hidden">
+              <span class="file-name" id="image-file-name"></span>
+              <button class="clear-file-btn" id="image-clear-btn">&times;</button>
+            </div>
+          </div>
+          <div class="input-hint">Extracts text via local OCR & analyzes visual context via Gemini Multimodal.</div>
+        </div>
+      </section>
+
+      <!-- Tab 4: PDF Input -->
+      <section id="tab-pane-pdf" class="tab-pane">
+        <div class="form-group">
+          <label>Upload PDF Document</label>
+          <div class="dropzone" id="pdf-dropzone">
+            <input type="file" id="pdf-file-input" accept="application/pdf" class="file-hidden">
+            <div class="dropzone-content">
+              <span class="dropzone-icon">📄</span>
+              <p class="dropzone-title">Click to browse or drop PDF</p>
+              <p class="dropzone-sub">Official circulars, reports, scanned PDFs (Max 15MB)</p>
+            </div>
+            <div id="pdf-file-preview" class="file-preview-card hidden">
+              <span class="file-name" id="pdf-file-name"></span>
+              <button class="clear-file-btn" id="pdf-clear-btn">&times;</button>
+            </div>
+          </div>
+          <div class="input-hint">Parsed with native extraction & PyMuPDF with OCR fallback.</div>
+        </div>
+      </section>
+
+      <!-- Tab 5: Audio Input -->
+      <section id="tab-pane-audio" class="tab-pane">
+        <div class="form-group">
+          <label>Upload Audio / WhatsApp Voice Note</label>
+          <div class="dropzone" id="audio-dropzone">
+            <input type="file" id="audio-file-input" accept="audio/mpeg, audio/ogg, audio/wav, audio/m4a, audio/mp4" class="file-hidden">
+            <div class="dropzone-content">
+              <span class="dropzone-icon">🎙️</span>
+              <p class="dropzone-title">Click to browse or drop voice note</p>
+              <p class="dropzone-sub">MP3, OGG, WAV, M4A (Max 15MB, &lt; 3 mins)</p>
+            </div>
+            <div id="audio-file-preview" class="file-preview-card hidden">
+              <span class="file-name" id="audio-file-name"></span>
+              <button class="clear-file-btn" id="audio-clear-btn">&times;</button>
+            </div>
+          </div>
+          <div class="input-hint">Gemini audio comprehension parses spoken claims accurately.</div>
+        </div>
+      </section>
+
+      <!-- Explicit Consent Box (Mandatory Security Policy) -->
+      <div class="consent-box">
+        <label class="checkbox-container">
+          <input type="checkbox" id="user-consent-checkbox" checked>
+          <span class="checkmark"></span>
+          <span class="consent-text">I consent to analyze this content with TruthLine AI via verified fact-check sources.</span>
+        </label>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-row">
+        <button id="verify-submit-btn" class="primary-btn glow-effect">
+          <span class="btn-icon">⚡</span>
+          <span class="btn-text">Verify Claim</span>
+        </button>
+      </div>
+
+      <!-- Progress / Pipeline Timeline -->
+      <div id="pipeline-progress" class="pipeline-progress hidden">
+        <div class="progress-bar-container">
+          <div id="progress-bar-fill" class="progress-bar-fill"></div>
+        </div>
+        <div class="stage-status-label" id="stage-status-label">Stage 1/8: Processing Input...</div>
+        <div class="stage-steps-indicator" id="stage-steps-indicator">
+          <span class="step-dot active" title="1. Input"></span>
+          <span class="step-dot" title="2. Claim Extract"></span>
+          <span class="step-dot" title="3. Search"></span>
+          <span class="step-dot" title="4. Source Authority"></span>
+          <span class="step-dot" title="5. Compare"></span>
+          <span class="step-dot" title="6. Challenger"></span>
+          <span class="step-dot" title="7. Auditor"></span>
+          <span class="step-dot" title="8. Verdict"></span>
+        </div>
+      </div>
+
+      <!-- Results Display Card -->
+      <div id="result-container" class="result-container hidden">
+        <div class="result-header">
+          <div class="verdict-banner" id="verdict-banner">
+            <span class="verdict-icon" id="verdict-icon"></span>
+            <div class="verdict-text-group">
+              <span class="verdict-badge" id="verdict-badge"></span>
+              <span class="verdict-subtitle" id="verdict-subtitle"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plain Language Explanation -->
+        <div class="card result-explanation-card">
+          <div class="card-title">Verdict Summary</div>
+          <p id="explanation-text" class="explanation-text"></p>
+        </div>
+
+        <!-- Atomic Claims Breakdown -->
+        <div class="card atomic-claims-card">
+          <div class="card-title">Atomic Claims Tested (<span id="atomic-claims-count">0</span>)</div>
+          <div id="atomic-claims-list" class="atomic-claims-list"></div>
+        </div>
+
+        <!-- Top Verified Sources & Citations -->
+        <div class="card sources-card">
+          <div class="card-title">Sources & Citations (<span id="sources-count">0</span>)</div>
+          <div id="sources-list" class="sources-list"></div>
+        </div>
+
+        <!-- Challenger & Auditor Findings -->
+        <div class="card audits-card">
+          <div class="audit-row">
+            <div class="audit-col">
+              <div class="audit-subhead">⚖️ Challenger Agent</div>
+              <div id="challenger-summary" class="audit-body"></div>
+            </div>
+            <div class="audit-col">
+              <div class="audit-subhead">🔍 Evidence Auditor</div>
+              <div id="auditor-summary" class="audit-body"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Open in Full Investigation Panel -->
+        <button id="view-deep-dive-btn" class="secondary-btn w-full">
+          Open Full Investigation Deep-Dive &rarr;
+        </button>
+      </div>
+
+      <!-- Error Card -->
+      <div id="error-card" class="error-card hidden">
+        <div class="error-icon">⚠️</div>
+        <div class="error-body">
+          <div class="error-title" id="error-title">Verification Failed</div>
+          <p class="error-message" id="error-message"></p>
+        </div>
+        <button id="error-retry-btn" class="error-retry-btn">Retry</button>
+      </div>
+    </main>
+
+    <!-- Footer Controls -->
+    <footer class="footer">
+      <div class="footer-toggles">
+        <label class="toggle-control" title="Toggle WhatsApp message scanning assistance (Default: OFF)">
+          <input type="checkbox" id="whatsapp-toggle">
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">WhatsApp Assist</span>
+        </label>
+      </div>
+      <div class="footer-actions">
+        <button id="clear-results-btn" class="link-btn" title="Clear current displayed result">Clear</button>
+        <button id="history-btn" class="link-btn" title="View SQLite history">History</button>
+        <button id="delete-history-btn" class="link-btn text-danger" title="Delete all verification history">Clear DB</button>
+      </div>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

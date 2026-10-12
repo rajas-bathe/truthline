@@ -1,0 +1,76 @@
+/* TRUTHLINE AI — WhatsApp Web In-Page Inspection Styles */
+
+.truthline-wa-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  margin-bottom: 2px;
+  padding: 3px 8px;
+  background: rgba(10, 20, 38, 0.92);
+  border: 1px solid rgba(0, 210, 255, 0.4);
+  border-radius: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #00d2ff;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  user-select: none;
+  z-index: 100;
+}
+
+.truthline-wa-badge:hover {
+  background: rgba(0, 210, 255, 0.15);
+  border-color: #00d2ff;
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.truthline-wa-badge-icon {
+  font-size: 12px;
+}
+
+.truthline-wa-badge-text {
+  letter-spacing: 0.2px;
+}
+
+/* Floating Quick Action for Selected Text */
+.truthline-wa-selection-popup {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #0a1122;
+  border: 1px solid #00d2ff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 10px rgba(0, 210, 255, 0.3);
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 999999;
+  transform: translateY(-100%);
+  margin-top: -8px;
+  animation: truthlineFadeIn 0.15s ease-out;
+}
+
+.truthline-wa-selection-popup:hover {
+  background: #101c36;
+  border-color: #00f5a0;
+  box-shadow: 0 0 15px rgba(0, 245, 160, 0.4);
+}
+
+@keyframes truthlineFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-90%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-100%);
+  }
+}

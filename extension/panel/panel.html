@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRUTHLINE AI — Deep Investigation Panel</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body class="dark-theme">
+  <div class="panel-layout">
+    <!-- Top Navigation Bar -->
+    <header class="panel-header">
+      <div class="brand-group">
+        <div class="shield-logo">🛡️</div>
+        <div>
+          <h1 class="brand-heading">TRUTHLINE AI <span class="badge-forensic">INVESTIGATION PANEL</span></h1>
+          <p class="brand-sub">DON'T JUST FORWARD. VERIFY. &bull; 8-STAGE DEEP FORENSIC PIPELINE</p>
+        </div>
+      </div>
+      <div class="panel-controls">
+        <div id="backend-health-pill" class="health-pill">
+          <span class="health-dot"></span>
+          <span id="backend-health-text">Connecting...</span>
+        </div>
+        <button id="refresh-history-btn" class="header-action-btn" title="Refresh History">🔄 Refresh</button>
+        <button id="export-markdown-btn" class="header-action-btn" title="Export Investigation as Markdown">📋 Copy Report</button>
+      </div>
+    </header>
+
+    <!-- Main Grid: Investigation Detail + History Sidebar -->
+    <div class="panel-grid">
+      <!-- Left / Main: Current Investigation 8-Stage Breakdown -->
+      <main class="main-investigation">
+        <!-- Verdict Summary Hero Card -->
+        <div id="hero-verdict-card" class="hero-card">
+          <div class="hero-top">
+            <div class="verdict-tag-wrap">
+              <span id="hero-verdict-icon" class="hero-icon">🛡️</span>
+              <div>
+                <div class="hero-verdict-label" id="hero-verdict-label">AWAITING INPUT</div>
+                <div class="hero-verdict-sub" id="hero-verdict-sub">Enter text or select a history record to view full forensic pipeline analysis.</div>
+              </div>
+            </div>
+            <div class="evidence-strength-wrap">
+              <div class="metric-label">Evidence Strength</div>
+              <div class="meter-bar">
+                <div id="evidence-strength-bar" class="meter-fill" style="width: 0%;"></div>
+              </div>
+              <span id="evidence-strength-text" class="meter-score">--</span>
+            </div>
+          </div>
+          <div class="hero-explanation" id="hero-explanation-text">
+            No active verification selected. Use the TruthLine Chrome Extension popup, right-click on web text, or inspect WhatsApp messages to run the 8-stage verification pipeline.
+          </div>
+          <div class="hero-meta-row">
+            <span id="hero-input-type" class="meta-tag">Input: None</span>
+            <span id="hero-timestamp" class="meta-tag">Date: --</span>
+            <span id="hero-execution-time" class="meta-tag">Time: -- ms</span>
+            <span id="hero-claims-tested" class="meta-tag">0 Claims</span>
+          </div>
+        </div>
+
+        <!-- 8-Stage Pipeline Accordion / Grid -->
+        <section class="stages-container">
+          <h2 class="section-title">8-Stage Forensic Pipeline Execution</h2>
+
+          <!-- Stage 1: Input Processing -->
+          <div class="stage-card" id="stage-card-1">
+            <div class="stage-header" data-stage="1">
+              <div class="stage-title-wrap">
+                <span class="stage-num">01</span>
+                <div>
+                  <h3 class="stage-title">Input Processing & Sanitization</h3>
+                  <p class="stage-desc">MIME validation, size safety, OCR text extraction, SSRF URL fetch.</p>
+                </div>
+              </div>
+              <span class="stage-status-badge badge-pending" id="s1-badge">IDLE</span>
+            </div>
+            <div class="stage-body" id="s1-body">
+              <div class="stage-detail-row"><strong>Sanitized Snippet:</strong> <span id="s1-snippet">None</span></div>
+              <div class="stage-detail-row"><strong>Extracted Characters:</strong> <span id="s1-chars">0</span></div>
+              <div class="stage-detail-row"><strong>Processing Method:</strong> <span id="s1-method">Direct</span></div>
+            </div>
+          </div>
+
+          <!-- Stage 2: Atomic Claim Decomposition -->
+          <div class="stage-card" id="stage-card-2">
+            <div class="stage-header" data-stage="2">
+              <div class="stage-title-wrap">
+                <span class="stage-num">02</span>
+                <div>
+                  <h3 class="stage-title">Atomic Claim Decomposition</h3>
+                  <p class="stage-desc">Separates input into discrete, testable factual propositions.</p>
+                </div>
+              </div>
+              <span class="stage-status-badge badge-pending" id="s2-badge">IDLE</span>
+            </div>
+            <div class="stage-body" id="s2-body">
+              <div id="s2-claims-container" class="atomic-claims-detail-list">
+                <div class="placeholder-text">No claims extracted yet.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stage 3: Grounded Evidence Retrieval -->
+          <div class="stage-card" id="stage-card-3">
+            <div class="stage-header" data-stage="3">
+              <div class="stage-title-wrap">
+                <span class="stage-num">03</span>
+                <div>
+                  <h3 class="stage-title">Supporting & Contradictory Evidence Retrieval</h3>
+                  <p class="stage-desc">Gemini Google Search Grounding & Tavily / Fact-Check verification.</p>
+                </div>
+              </div>
+              <span class="stage-status-badge badge-pending" id="s3-badge">IDLE</span>
+            </div>
+            <div class="stage-body" id="s3-body">
+              <div id="s3-sources-container" class="sources-detail-grid">
+                <div class="placeholder-text">No evidence sources retrieved yet.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stage 4: Source Authority & Freshness Analysis -->
+          <div class="stage-card" id="stage-card-4">
+            <div class="stage-header" data-stage="4">
+              <div class="stage-title-wrap">
+                <span class="stage-num">04</span>
+                <div>
+                  <h3 class="stage-title">Source Authority, Date, Relevance & Independence</h3>
+                  <p class="stage-desc">Distinguishes primary documents, fact-checkers, wire services, and blogs.</p>
+                </div>
+              </div>
+              <span class="stage-status-badge badge-pending" id="s4-badge">IDLE</span>
+            </div>
+            <div class="stage-body" id="s4-body">
+              <div id="s4-authority-breakdown" class="authority-breakdown">
+                <div class="placeholder-text">Awaiting source evaluation.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stage 5: Claim-to-Evidence Matrix Comparison -->
+          <div class="stage-card" id="stage-card-5">
+            <div class="stage-header" data-stage="5">
+              <div class="stage-title-wrap">
+                <span class="stage-num">05</span>
+                <div>
+                  <h3 class="stage-title">Claim-to-Evidence Matrix Comparison</h3>
+                  <p class="stage-desc">Cross-references claims against verified citations.</p>
+                </div>
+              </div>
+              <span class="stage-status-badge badge-pending" id="s5-badge">IDLE</span>
+            </div>
+            <div class="stage-body" id="s5-body">
+              <div id="s5-matrix-container" class="comparison-matrix">
+                <div class="placeholder-text">Awaiting comparison synthesis.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stage 6: Challenger Agent -->
+          <div class="stage-card" id="stage-card-6">
+            <div class="stage-header" data-stage="6">
+              <div class="stage-title-wrap">
+                <span class="stage-num">06</span>
+                <div>
+                  <h3 class="stage-title">Challenger Agent (Counter-Evidence & Missing Context)</h3>
+                  <p class="stage-desc">Adversarially seeks counter-arguments, cherry-picking, and omissions.</p>
+                </div>
+              </div>
+              <span class="stage-status-badge badge-pending" id="s6-badge">IDLE</span>
+            </div>
+            <div class="stage-body" id="s6-body">
+              <div class="challenger-content">
+                <div class="challenger-quote" id="s6-challenger-text">Awaiting challenger audit.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stage 7: Evidence Auditor -->
+          <div class="stage-card" id="stage-card-7">
+            <div class="stage-header" data-stage="7">
+              <div class="stage-title-wrap">
+                <span class="stage-num">07</span>
+                <div>
+                  <h3 class="stage-title">Evidence Auditor (Citation Integrity & Hallucination Check)</h3>
+                  <p class="stage-desc">Ensures citations genuinely support assertions; downgrades ungrounded claims.</p>
+                </div>
+              </div>
+              <span class="stage-status-badge badge-pending" id="s7-badge">IDLE</span>
+            </div>
+            <div class="stage-body" id="s7-body">
+              <div class="auditor-content">
+                <div class="auditor-log" id="s7-auditor-text">Awaiting citation audit.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stage 8: Final Verdict & Plain-Language Explanation -->
+          <div class="stage-card" id="stage-card-8">
+            <div class="stage-header" data-stage="8">
+              <div class="stage-title-wrap">
+                <span class="stage-num">08</span>
+                <div>
+                  <h3 class="stage-title">Final Verdict & Shareable Summary</h3>
+                  <p class="stage-desc">Synthesizes plain-language WhatsApp rebuttal & transparent limitations.</p>
+                </div>
+              </div>
+              <span class="stage-status-badge badge-pending" id="s8-badge">IDLE</span>
+            </div>
+            <div class="stage-body" id="s8-body">
+              <div class="verdict-summary-box">
+                <div class="box-subheading">WhatsApp Forwardable Rebuttal:</div>
+                <div class="rebuttal-quote" id="s8-rebuttal-text">None</div>
+                <button id="copy-rebuttal-btn" class="secondary-btn mt-2">📋 Copy WhatsApp Rebuttal</button>
+              </div>
+              <div class="limitations-box mt-2">
+                <div class="box-subheading">Investigation Limitations & Caveats:</div>
+                <div class="limitations-text" id="s8-limitations-text">
+                  TruthLine AI bases evaluations on open web citations and Google Grounded search. Fact checks reflect current available public records.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- Right: SQLite History & Filter Sidebar -->
+      <aside class="history-sidebar">
+        <div class="sidebar-header">
+          <h2 class="sidebar-title">Verification History (SQLite)</h2>
+          <span id="history-total-count" class="badge-count">0</span>
+        </div>
+
+        <!-- History Search & Filter -->
+        <div class="history-filters">
+          <input type="text" id="history-search-input" placeholder="Search claims..." class="search-input">
+          <select id="history-verdict-filter" class="filter-select">
+            <option value="ALL">All Verdicts</option>
+            <option value="VERIFIED">VERIFIED</option>
+            <option value="FALSE">FALSE</option>
+            <option value="OUTDATED">OUTDATED</option>
+            <option value="PARTIALLY_SUPPORTED">PARTIALLY SUPPORTED</option>
+            <option value="CANNOT_CONFIRM">CANNOT CONFIRM</option>
+          </select>
+        </div>
+
+        <!-- History List -->
+        <div id="history-items-list" class="history-items-list">
+          <div class="placeholder-text">Loading history...</div>
+        </div>
+
+        <div class="sidebar-footer">
+          <button id="clear-all-history-btn" class="danger-outline-btn w-full">Delete All SQLite Records</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="panel.js"></script>
+</body>
+</html>
