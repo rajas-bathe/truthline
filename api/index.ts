@@ -21,10 +21,18 @@ const app = createApp();
 
 export default function handler(req: any, res: any) {
   ensureInitialized();
-  if (req.originalUrl && req.originalUrl.startsWith('/api')) {
+
+  // If req.url got rewritten or needs normalization:
+  if (req.originalUrl && req.originalUrl.startsWith('/api') && !req.originalUrl.startsWith('/api/index')) {
     req.url = req.originalUrl;
+  } else if (req.url === '/api/index' || req.url === '/api' || req.url === '/api/') {
+    const matchedPath = req.headers && req.headers['x-matched-path'];
+    if (typeof matchedPath === 'string' && matchedPath.startsWith('/api') && matchedPath !== '/api/index') {
+      req.url = matchedPath;
+    }
   } else if (req.url && !req.url.startsWith('/api')) {
     req.url = '/api' + req.url;
   }
+
   return app(req, res);
 }
